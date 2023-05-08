@@ -14,9 +14,9 @@ void Sprite::initialize(int texID, int imgWidth, int imgHeight, float parallaxFa
 	this->parallaxFactor = parallaxFactor;
 
 	speed.x = 5.0;
-	//Velocidade no eixo y n„o È usada para o pulo
+	//Velocidade no eixo y n√£o √© usada para o pulo
 	speed.y = 5.0;
-	//Usado para trocar a animaÁ„o de pulo
+	//Usado para trocar a anima√ß√£o de pulo
 	airborne = false;
 
 	dx = 1.0 / float(nFrames);
@@ -36,27 +36,27 @@ void Sprite::initialize(int texID, int imgWidth, int imgHeight, float parallaxFa
 
 	GLuint VBO;
 
-	//GeraÁ„o do identificador do VBO
+	//Gera√ß√£o do identificador do VBO
 	glGenBuffers(1, &VBO);
-	//Faz a conex„o (vincula) do buffer como um buffer de array
+	//Faz a conex√£o (vincula) do buffer como um buffer de array
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//Envia os dados do array de floats para o buffer da OpenGl
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//GeraÁ„o do identificador do VAO (Vertex Array Object)
+	//Gera√ß√£o do identificador do VAO (Vertex Array Object)
 	glGenVertexArrays(1, &VAO);
-	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vÈrtices
+	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de v√©rtices
 	// e os ponteiros para os atributos 
 	glBindVertexArray(VAO);
 	//Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando: 
-	// LocalizaÁ„o no shader * (a localizaÁ„o dos atributos devem ser correspondentes no layout especificado no vertex shader)
+	// Localiza√ß√£o no shader * (a localiza√ß√£o dos atributos devem ser correspondentes no layout especificado no vertex shader)
 	// Numero de valores que o atributo tem (por ex, 3 coordenadas xyz) 
 	// Tipo do dado
-	// Se est· normalizado (entre zero e um)
+	// Se est√° normalizado (entre zero e um)
 	// Tamanho em bytes 
 	// Deslocamento a partir do byte zero 
 
-	//Atributo posiÁ„o
+	//Atributo posi√ß√£o
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
@@ -68,11 +68,11 @@ void Sprite::initialize(int texID, int imgWidth, int imgHeight, float parallaxFa
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 
-	// Observe que isso È permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vÈrtice 
-	// atualmente vinculado - para que depois possamos desvincular com seguranÁa
+	// Observe que isso √© permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de v√©rtice 
+	// atualmente vinculado - para que depois possamos desvincular com seguran√ßa
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// Desvincula o VAO (È uma boa pr·tica desvincular qualquer buffer ou array para evitar bugs medonhos)
+	// Desvincula o VAO (√© uma boa pr√°tica desvincular qualquer buffer ou array para evitar bugs medonhos)
 	glBindVertexArray(0);
 }
 
@@ -90,8 +90,8 @@ void Sprite::draw()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-//Sobrecarga do mÈtodo update que ajusta a posiÁ„o do sprite de acordo com o fator de parallax.
-//Os sprites do fundo recebem um fator <1. Os no nÌvel do personagem e do ch„o recebem 1. Os da frente, perto da "c‚mera", receberiam >1 se houvesse algum.
+//Sobrecarga do m√©todo update que ajusta a posi√ß√£o do sprite de acordo com o fator de parallax.
+//Os sprites do fundo recebem um fator <1. Os no n√≠vel do personagem e do ch√£o recebem 1. Os da frente, perto da "c√¢mera", receberiam >1 se houvesse algum.
 void Sprite::update(float deltaX)
 {
 	position.x += deltaX * parallaxFactor;
@@ -106,7 +106,7 @@ void Sprite::update()
 	int modelLoc = glGetUniformLocation(shader->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, FALSE, glm::value_ptr(model));
 
-	//Utilizado para limitar o frame rate das animaÁıes
+	//Utilizado para limitar o frame rate das anima√ß√µes
 	double currentTime = glfwGetTime();
 	double deltaTime = currentTime - lastUpdateTime;
 
@@ -116,12 +116,13 @@ void Sprite::update()
 	}
 
 	//Se o personagem estivar no ar, calculamos o arco do pulo de acordo com a gravidade e o tempo.
+	//Bugado, velocidade diferente dependendo do PC. Falta investigar porqu√™.
 	if (airborne) {
-		jumpSpeed += gravity * deltaTime;
-		position.y += jumpSpeed * deltaTime;
+		jumpSpeed += gravity * deltaTime/5;
+		position.y += jumpSpeed * deltaTime / 5;
 
-		//Se o personagem toca no ch„o (ou passa dele) pıe no ch„o, retira a propriedade aÈrea, zera a velocidade de pulo
-		//e atualiza a animaÁ„o para a do ch„o correspondente ‡ direÁ„o em que ele est· virado
+		//Se o personagem toca no ch√£o (ou passa dele) p√µe no ch√£o, retira a propriedade a√©rea, zera a velocidade de pulo
+		//e atualiza a anima√ß√£o para a do ch√£o correspondente √† dire√ß√£o em que ele est√° virado
 		if (position.y <= 110) {
 			position.y = 110;
 			jumpSpeed = 0.0f;
@@ -129,21 +130,21 @@ void Sprite::update()
 			iAnimation = direction + 6;
 		}
 
-		//Troca o quadro da animaÁ„o de acordo atravÈs do offset da folha de sprites
+		//Troca o quadro da anima√ß√£o de acordo atrav√©s do offset da folha de sprites
 		float offsetx = iFrame * dx;
 		float offsety;
 
-		//Se a velocidade do pulo È positiva, pıe o personagem na posiÁ„o de pulo de acordo com a direÁ„o em que ele est· virado.
+		//Se a velocidade do pulo √© positiva, p√µe o personagem na posi√ß√£o de pulo de acordo com a dire√ß√£o em que ele est√° virado.
 		if (jumpSpeed > 0) iAnimation = direction + 2;
-		//Se a velocidade do pulo È negativa, pıe o personagem na posiÁ„o de queda de acordo com a direÁ„o
+		//Se a velocidade do pulo √© negativa, p√µe o personagem na posi√ß√£o de queda de acordo com a dire√ß√£o
 		else if (jumpSpeed < 0) iAnimation = direction + 4;
 
-		//Troca a animaÁ„o de acordo atravÈs do offset da folha de sprites
+		//Troca a anima√ß√£o de acordo atrav√©s do offset da folha de sprites
 		offsety = iAnimation * dy;
 
 		shader->setVec2("offsets", offsetx, offsety);
 	}
-	//Caso o personagem n„o estiver no ar, troca o quadro de animaÁ„o (para os sprites com mais de 1 quadro) e a animaÁ„o de acordo com o offset (para os sprites com ais de 1 quadro)
+	//Caso o personagem n√£o estiver no ar, troca o quadro de anima√ß√£o (para os sprites com mais de 1 quadro) e a anima√ß√£o de acordo com o offset (para os sprites com ais de 1 quadro)
 	else {
 		float offsetx = 1, offsety = 1;
 		if(nFrames >1)	offsetx = iFrame * dx;
