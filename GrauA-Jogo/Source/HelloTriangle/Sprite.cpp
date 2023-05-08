@@ -1,6 +1,7 @@
 #include "Sprite.h"
 #include <GLFW/glfw3.h>
 
+//Gravidade usada para calcular o pulo
 const float gravity = -10.0f;
 
 void Sprite::initialize(int texID, int imgWidth, int imgHeight, float parallaxFactor, int nAnimations, int nFrames)
@@ -13,7 +14,9 @@ void Sprite::initialize(int texID, int imgWidth, int imgHeight, float parallaxFa
 	this->parallaxFactor = parallaxFactor;
 
 	speed.x = 5.0;
+	//Velocidade no eixo y não é usada para o pulo
 	speed.y = 5.0;
+	//Usado para trocar a animação de pulo
 	airborne = false;
 
 	dx = 1.0 / float(nFrames);
@@ -87,6 +90,8 @@ void Sprite::draw()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+//Sobrecarga do método update que ajusta a posição do sprite de acordo com o fator de parallax.
+//Os sprites do fundo recebem um fator <1. Os no nível do personagem e do chão recebem 1. Os da frente, perto da "câmera", receberiam >1 se houvesse algum.
 void Sprite::update(float deltaX)
 {
 	position.x += deltaX * parallaxFactor;
@@ -101,6 +106,7 @@ void Sprite::update()
 	int modelLoc = glGetUniformLocation(shader->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, FALSE, glm::value_ptr(model));
 
+	//Utilizado para limitar o frame rate das animações
 	double currentTime = glfwGetTime();
 	double deltaTime = currentTime - lastUpdateTime;
 
@@ -109,12 +115,13 @@ void Sprite::update()
 		lastUpdateTime = currentTime;
 	}
 
-
+	//Se o personagem estivar no ar, calculamos o arco do pulo de acordo com a gravidade e o tempo.
 	if (airborne) {
 		jumpSpeed += gravity * deltaTime;
 		position.y += jumpSpeed * deltaTime;
 
-
+		//Se o personagem toca no chão (ou passa dele) põe no chão, retira a propriedade aérea, zera a velocidade de pulo
+		//e atualiza a animação para a do chão correspondente à direção em que ele está virado
 		if (position.y <= 110) {
 			position.y = 110;
 			jumpSpeed = 0.0f;
@@ -122,15 +129,21 @@ void Sprite::update()
 			iAnimation = direction + 6;
 		}
 
+		//Troca o quadro da animação de acordo através do offset da folha de sprites
 		float offsetx = iFrame * dx;
 		float offsety;
+
+		//Se a velocidade do pulo é positiva, põe o personagem na posição de pulo de acordo com a direção em que ele está virado.
 		if (jumpSpeed > 0) iAnimation = direction + 2;
+		//Se a velocidade do pulo é negativa, põe o personagem na posição de queda de acordo com a direção
 		else if (jumpSpeed < 0) iAnimation = direction + 4;
 
+		//Troca a animação de acordo através do offset da folha de sprites
 		offsety = iAnimation * dy;
 
 		shader->setVec2("offsets", offsetx, offsety);
 	}
+	//Caso o personagem não estiver no ar, troca o quadro de animação (para os sprites com mais de 1 quadro) e a animação de acordo com o offset (para os sprites com ais de 1 quadro)
 	else {
 		float offsetx = 1, offsety = 1;
 		if(nFrames >1)	offsetx = iFrame * dx;
@@ -149,4 +162,4 @@ void Sprite::getAABB(glm::vec2& min, glm::vec2& max)
 	min.y = position.y - dimensions.y / 2.0;
 	max.y = position.y + dimensions.y / 2.0;
 
-}
+} 

@@ -3,8 +3,6 @@
 #include <assert.h>
 
 using namespace std;
-//TODO: Limpar código e incluir comentários
-//TODO: Listar bugs
 
 // GLAD
 #include <glad/glad.h>
@@ -79,7 +77,6 @@ int main()
 	int goombawidth, goombaheight;
 	int coinwidth, coinheight;
 
-	// Gerando um buffer simples, com a geometria de um triângulo
 	GLuint texID = generateTexture("../../textures/fundo.png", bgwidth, bgheight);
 	GLuint texID1 = generateTexture("../../textures/frente.png", fgwidth, fgheight);
 	GLuint texID2 = generateTexture("../../textures/mario.png", charwidth, charheight);
@@ -104,10 +101,10 @@ int main()
 	foreground.setPosition(glm::vec3(fgwidth/2+665, 300, 0));
 	foreground.setScale(glm::vec3(fgwidth*1.3, fgheight*1.3, 1));
 
-
+	//Aqui são configuradas as posições das moedas e goombas. Para evitar repetir o código, as moedas e goombas foram postos em arrays.
+	//Os goombas e as moedas também são marcadas para serem "removidas" quando o personagem colidir com os sprites mais tarde.
 	Sprite goombas[3];
 	Sprite moedas[3];
-
 	int goombaXPositions[3] = {250, 500, 750};
 	int coinXPositions[3] = {100, 550, 800};
 	bool pegouMoeda[3] = { false, false, false };
@@ -149,12 +146,10 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
+	//Valores usados para o scrolling
 	float offsetX = 0;
 	float ultimaPosicaoX = character.getPosition().x;
 	double lastUpdateTime = glfwGetTime();
-	
-	glm::vec2 position;
 
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
@@ -167,22 +162,24 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		//Valor usado para o scrolling
 		offsetX = ultimaPosicaoX - character.getPosition().x;
 
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastUpdateTime;
+		//Move a projeção de acordo com o movimento do personagem, determinado na iteração anterior do loop com o offsetX
 		projection = projection * glm::translate(glm::mat4(1.0f), glm::vec3(offsetX, 0.0f, 0.0f));;
 		GLint projLoc = glGetUniformLocation(shader.ID, "projection");
 		glUniformMatrix4fv(projLoc, 1, FALSE, glm::value_ptr(projection));
 
-
+		//Move o fundo e o cenário (que, no sprite, vai usar o valor de parallax para determinar o quanto vai ser movido)
 		background.update(offsetX);
 		background.draw();
 
 		foreground.update(offsetX);
 		foreground.draw();
 
+		//Itera sobre os arrays de moedas e goombas e desenha eles na tela (com o scrolling para que eles fiquem "parados" em relação ao chão) caso eles não tenham colidido com o personagem
 		for (int i = 0; i < 3; ++i) {
 			if (!bateuNoGoomba[i]) {
 				goombas[i].update(offsetX);
@@ -197,11 +194,12 @@ int main()
 		character.update();
 		character.draw();
 
+		//marca posição do personagem para determinarmos o quanto ele se mexeu desde a última iteração do loop.
 		ultimaPosicaoX = character.getPosition().x;
 
+		//Testa colisão das moedas e goombas iterando sobre os arrays. Caso o personagem colidir, "remove" eles do jogo
 		for (int i = 0; i < 3; i++) {
 			if (testCollision(character, moedas[i]) && !pegouMoeda[i]) {
-				cout << "MOEDA" << endl;
 				pegouMoeda[i] = true;
 				moedasFaltando--;
 			}
@@ -217,6 +215,8 @@ int main()
 		glfwSwapBuffers(window);
 
 		//Fim de jogo
+		//Por motivos de simplicidade, o jogo acaba quando o personagem pegar todas as moedas ou colidir com todos goombas.
+		//Não foram implementadas mensagens positivas ou negativas de fim de jogo
 		if (moedasFaltando == 0 || vidas == 0)
 			glfwSetWindowShouldClose(window, GL_TRUE);
 	}
@@ -242,11 +242,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		character.jump();
 	}
+
+	//Retirei está funcionalidade por não ter animação ou desejar ter qualquer movimento associado.
+	//Caso habilitado, permite que o personagem caia mais rápido e, embora permita que ele passe do chão, o pulo atualiza a posição para o chão no início.
 	//if (key == GLFW_KEY_S || key == GLFW_KEY_DOWN)
-	//{
-		
+	//{	
 	//	character.moveDown();
 	//}
+	//Caso o personagem não estiver se mexendo, chama a função que confere se ele está no ar e põe ele na animação parada
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE &&
 		glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE &&
 		glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE &&
@@ -360,6 +363,7 @@ GLuint generateTexture(string filePath, int& width, int& height)
 	return texID;
 }
 
+//Confere se 2 sprites colidem
 bool testCollision(Sprite spr1, Sprite spr2)
 {
 	glm::vec2 min1, min2, max1, max2;
