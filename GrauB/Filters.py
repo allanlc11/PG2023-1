@@ -74,11 +74,11 @@ def binariza(img):
     return img3
 
 
-def recorta(start_row, end_row, start_col, end_col):
+def recorta(img, start_row, end_row, start_col, end_col):
     return img[start_row:end_row, start_col:end_col]
 
-def redimensiona(width, heigh):
-    return cv.resize(image, (width, heigh), interpolation= cv2.INTER_LINEAR)
+def redimensiona(img, width, heigh):
+    return cv.resize(img, (width, heigh), interpolation= cv2.INTER_LINEAR)
 
 def blur(img):    
     return cv.blur(img,(15,15))
@@ -87,7 +87,7 @@ def canny(img):
     imgGrayscale =  cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     imgGaussianBlurred15x15 = cv.GaussianBlur(imgGrayscale,(15,15),0)
     return cv.Canny(imgGrayscale,50,100)
-    
+     
 def sobel(img):
     ddepth = cv.CV_16S
     imgGrayscale =  cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -115,5 +115,6 @@ def nitidez(img):
         [0, -1, 0],
         [-1, 5, -1],
         [0, -1, 0]
-    ])        
+    ])
+        
     return cv.filter2D(img, ddepth=-1, kernel=kernel)
