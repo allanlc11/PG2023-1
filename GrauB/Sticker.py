@@ -39,15 +39,3 @@ def overlay(background, foreground, x_offset=None, y_offset=None):
     background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
     out = background.copy()
     return out
-
-#background = cv2.imread('baboon.png')
-#foreground = cv2.imread('eyeglasses.png', cv2.IMREAD_UNCHANGED)
-
-#print(foreground.shape) # must be (x,y,4)
-#print(background.shape) # must be (x,y,3)
-
-# downscale logo by half and position on bottom right reference
-#out = overlay(background,foreground, 100, 50) 
-
-#cv2.imshow('yeah',out)
-#cv2.waitKey(0)
