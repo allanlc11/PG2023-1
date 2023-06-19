@@ -88,7 +88,6 @@ def canny(img):
     imgGaussianBlurred15x15 = cv.GaussianBlur(imgGrayscale,(15,15),0)
     return cv.Canny(imgGrayscale,50,100)
     
-#TODO - Ler sobre e anotar   
 def sobel(img):
     ddepth = cv.CV_16S
     imgGrayscale =  cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -116,6 +115,5 @@ def nitidez(img):
         [0, -1, 0],
         [-1, 5, -1],
         [0, -1, 0]
-    ])
-        
+    ])        
     return cv.filter2D(img, ddepth=-1, kernel=kernel)
