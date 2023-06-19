@@ -195,10 +195,6 @@ root.resizable(0, 0)
 filters_frame = ttk.Frame(root)
 filters_frame.pack(side="left", fill="y")
 
-# Quadro de cima com os stickers
-stickers_frame = ttk.Frame(root)
-stickers_frame.pack(side="right", fill="x")
-
 # Quadro onde a imagem é desenhada
 canvas = ttk.Canvas(root, width=WIDTH, height=HEIGHT)
 canvas.bind("<Button-1>", on_click)
