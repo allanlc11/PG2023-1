@@ -12,7 +12,7 @@ def cv2pil(img):
     return Image.fromarray(cv.cvtColor(img.copy(), cv.COLOR_BGR2RGB))
     
 def pil2cv(img):
-    return np.asarray(img.copy())
+    return cv.cvtColor(np.asarray(img.copy()), cv.COLOR_BGR2RGB)
 
 
 def abrir_imagem():
@@ -35,8 +35,9 @@ def open_camera():
     
         
 def aplica():
-    global original, convertida
-    original = cv.cvtColor(pil2cv(convertida.copy()), cv.COLOR_BGR2RGB)
+    global original, convertida, holding_sticker
+    holding_sticker = ""
+    original = pil2cv(convertida)
        
 def salva():
     global original
@@ -178,12 +179,10 @@ def stick(x,y):
             convertida = cv2pil(sticker.overlay(original.copy(), adesivo, pos_x, pos_y))
             photo = ImageTk.PhotoImage(convertida.copy())
             canvas.create_image(photo.width()/2, photo.height()/2, image=photo)
-            holding_sticker = ""
     
 
 def on_click(event):
     stick(event.x, event.y)
-    #print("Pointer is currently at %d, %d" %(event.x,event.y))
 
 root = ttk.Window()
 root.title("Editor de Imagens")
